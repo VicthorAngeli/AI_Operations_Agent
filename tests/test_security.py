@@ -61,3 +61,18 @@ def test_sensitive_endpoints_require_configured_api_key() -> None:
 
     assert missing.status_code == 401
     assert valid.status_code == 200
+
+
+def test_production_rejects_missing_api_key_configuration() -> None:
+    original_token = settings.API_AUTH_TOKEN
+    original_environment = settings.APP_ENV
+    settings.API_AUTH_TOKEN = ""
+    settings.APP_ENV = "production"
+    try:
+        response = client.get("/metrics")
+    finally:
+        settings.API_AUTH_TOKEN = original_token
+        settings.APP_ENV = original_environment
+
+    assert response.status_code == 503
+    assert "API_AUTH_TOKEN" in response.json()["detail"]
