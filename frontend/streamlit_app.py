@@ -6,7 +6,8 @@ import streamlit as st
 from app.config.settings import settings
 
 def _api_headers() -> dict[str, str]:
-    return {"X-API-Key": settings.API_AUTH_TOKEN} if settings.API_AUTH_TOKEN else {}
+    api_auth_token = getattr(settings, "API_AUTH_TOKEN", "")
+    return {"X-API-Key": api_auth_token} if api_auth_token else {}
 
 def analyze_request(customer_id: int, message: str) -> dict[str, object]:
     with httpx.Client(
