@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from fastapi.testclient import TestClient
 
+from app.config.settings import settings
 from app.main import app, rate_limiter
 
 
@@ -47,3 +48,16 @@ def test_rate_limit_returns_retry_header() -> None:
     assert first.status_code == 200
     assert second.status_code == 429
     assert int(second.headers["Retry-After"]) >= 1
+
+
+def test_sensitive_endpoints_require_configured_api_key() -> None:
+    original_token = settings.API_AUTH_TOKEN
+    settings.API_AUTH_TOKEN = "test-secret"
+    try:
+        missing = client.get("/metrics")
+        valid = client.get("/metrics", headers={"X-API-Key": "test-secret"})
+    finally:
+        settings.API_AUTH_TOKEN = original_token
+
+    assert missing.status_code == 401
+    assert valid.status_code == 200

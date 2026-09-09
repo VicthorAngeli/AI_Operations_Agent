@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hmac
 from time import perf_counter
 
 from fastapi import FastAPI, HTTPException, Request
@@ -60,6 +61,27 @@ async def limit_analysis_requests(request: Request, call_next):
                 status_code=429,
                 content={"detail": "Rate limit exceeded. Try again later."},
                 headers={"Retry-After": str(retry_after)},
+            )
+    return await call_next(request)
+
+
+@app.middleware("http")
+async def protect_sensitive_endpoints(request: Request, call_next):
+    protected_paths = {"/analyze", "/metrics"}
+    if request.url.path.startswith("/executions/"):
+        protected_paths.add(request.url.path)
+    if request.url.path in protected_paths:
+        configured_token = settings.API_AUTH_TOKEN
+        supplied_token = request.headers.get("X-API-Key", "")
+        if settings.APP_ENV.casefold() == "production" and not configured_token:
+            return JSONResponse(
+                status_code=503,
+                content={"detail": "API_AUTH_TOKEN is not configured."},
+            )
+        if configured_token and not hmac.compare_digest(supplied_token, configured_token):
+            return JSONResponse(
+                status_code=401,
+                content={"detail": "A valid X-API-Key is required."},
             )
     return await call_next(request)
 

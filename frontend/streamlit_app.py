@@ -6,11 +6,16 @@ import streamlit as st
 from app.config.settings import settings
 
 
+def _api_headers() -> dict[str, str]:
+    return {"X-API-Key": settings.API_AUTH_TOKEN} if settings.API_AUTH_TOKEN else {}
+
+
 def analyze_request(customer_id: int, message: str) -> dict[str, object]:
     with httpx.Client(base_url=settings.API_BASE_URL, timeout=settings.DEFAULT_TIMEOUT_SECONDS) as client:
         response = client.post(
             "/analyze",
             json={"customer_id": customer_id, "message": message},
+            headers=_api_headers(),
         )
         response.raise_for_status()
         return response.json()
@@ -18,7 +23,7 @@ def analyze_request(customer_id: int, message: str) -> dict[str, object]:
 
 def fetch_execution(execution_id: str) -> dict[str, object]:
     with httpx.Client(base_url=settings.API_BASE_URL, timeout=settings.DEFAULT_TIMEOUT_SECONDS) as client:
-        response = client.get(f"/executions/{execution_id}")
+        response = client.get(f"/executions/{execution_id}", headers=_api_headers())
         response.raise_for_status()
         return response.json()
 

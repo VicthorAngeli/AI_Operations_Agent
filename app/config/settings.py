@@ -28,6 +28,7 @@ class Settings:
     STREAMLIT_HOST: str = os.getenv("STREAMLIT_HOST", "0.0.0.0")
     STREAMLIT_PORT: int = int(os.getenv("STREAMLIT_PORT", "8501"))
     API_BASE_URL: str = os.getenv("API_BASE_URL", "http://localhost:8000")
+    API_AUTH_TOKEN: str = os.getenv("API_AUTH_TOKEN", "")
     API_ALLOWED_ORIGINS: str = os.getenv("API_ALLOWED_ORIGINS", "http://localhost:8501")
     RATE_LIMIT_REQUESTS: int = int(os.getenv("RATE_LIMIT_REQUESTS", "30"))
     RATE_LIMIT_WINDOW_SECONDS: int = int(os.getenv("RATE_LIMIT_WINDOW_SECONDS", "60"))

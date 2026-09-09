@@ -81,6 +81,10 @@ O endpoint `/metrics` expõe métricas em formato compatível com Prometheus: to
 
 O endpoint `/analyze` aplica um limite fixo por endereço IP e retorna `429` com `Retry-After` quando a janela é excedida. Os valores são configurados por `RATE_LIMIT_REQUESTS` e `RATE_LIMIT_WINDOW_SECONDS`. Como o contador é local ao processo, ambientes com múltiplas réplicas devem aplicar o limite no gateway ou em um armazenamento compartilhado.
 
+### 15. Autenticação de API
+
+Em produção, `/analyze`, `/metrics` e `/executions/{execution_id}` exigem o header `X-API-Key`, comparado em tempo constante com `API_AUTH_TOKEN`. O token é recebido por ambiente e nunca é incluído no código, na imagem ou no repositório.
+
 ## Segurança
 
 - Chave da OpenAI via ambiente

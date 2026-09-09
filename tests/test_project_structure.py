@@ -17,6 +17,7 @@ def test_core_files_exist() -> None:
         ROOT / ".github" / "workflows" / "ci.yml",
         ROOT / ".env.production.example",
         ROOT / "docs" / "secrets.md",
+        ROOT / "SECURITY.md",
         ROOT / "README.md",
         ROOT / "app" / "__init__.py",
         ROOT / "app" / "config" / "settings.py",
